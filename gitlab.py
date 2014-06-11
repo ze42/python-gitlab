@@ -658,6 +658,7 @@ class GroupMember(GitlabObject):
     canGet = False
     canUpdate = False
     requiredCreateAttrs = ['group_id', 'user_id', 'access_level']
+    requiredListAttrs = ['group_id']
     requiredDeleteAttrs = ['group_id', 'user_id']
     shortPrintAttr = 'username'
 
@@ -766,6 +767,7 @@ class ProjectKey(GitlabObject):
     requiredListAttrs = ['project_id']
     requiredGetAttrs = ['project_id']
     requiredCreateAttrs = ['project_id', 'title', 'key']
+    shortPrintAttr = 'title'
 
 
 class ProjectEvent(GitlabObject):
@@ -941,7 +943,7 @@ class Project(GitlabObject):
                            'merge_requests_enabled', 'wiki_enabled',
                            'snippets_enabled', 'public', 'visibility_level',
                            'namespace_id', 'description']
-    shortPrintAttr = 'path'
+    shortPrintAttr = 'path_with_namespace'
 
     def Branch(self, id=None, **kwargs):
         return self._getListOrObject(ProjectBranch, id,
@@ -1062,7 +1064,7 @@ class Project(GitlabObject):
 
 
 class TeamMember(GitlabObject):
-    _url = '/user_teams/%(team_id)s/members'
+    _url = '/groups/%(team_id)s/members'
     canUpdate = False
     requiredCreateAttrs = ['team_id', 'user_id', 'access_level']
     requiredDeleteAttrs = ['team_id']
@@ -1072,7 +1074,7 @@ class TeamMember(GitlabObject):
 
 
 class TeamProject(GitlabObject):
-    _url = '/user_teams/%(team_id)s/projects'
+    _url = '/groups/%(team_id)s'
     _constructorTypes = {'owner': 'User', 'namespace': 'Group'}
     canUpdate = False
     requiredCreateAttrs = ['team_id', 'project_id', 'greatest_access_level']
@@ -1083,7 +1085,7 @@ class TeamProject(GitlabObject):
 
 
 class Team(GitlabObject):
-    _url = '/user_teams'
+    _url = '/groups'
     shortPrintAttr = 'name'
     requiredCreateAttrs = ['name', 'path']
     canUpdate = False
