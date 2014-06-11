@@ -187,6 +187,17 @@ class Gitlab(object):
         missing = []
         for k in obj_class.requiredListAttrs:
             if k not in kwargs:
+                if k == 'group_id' and 'group' in kwargs:
+                    name = kwargs['group']
+                    for g in self.list(Group):
+                        if g.__dict__['name'] == name:
+                            kwargs['group_id'] = g.__dict__['id']
+                if k == 'project_id' and 'project' in kwargs:
+                    name = kwargs['project']
+                    for p in self.list(Project):
+                        if p.__dict__['path_with_namespace'] == name:
+                            kwargs['project_id'] = p.__dict__['id']
+            if k not in kwargs:
                 missing.append(k)
         if missing:
             raise GitlabListError('Missing attribute(s): %s' %
