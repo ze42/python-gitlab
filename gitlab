@@ -316,7 +316,7 @@ try:
 except:
     die("Unknown object: %s" % what)
 
-if gitlab.GitlabObject not in getmro(cls):
+if gitlab.GitlabObject not in getmro(cls) or cls == gitlab.GitlabObject:
     die("Unknown object: %s" % what)
 
 if action == "help":
