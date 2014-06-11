@@ -28,6 +28,12 @@ __license__ = 'LGPL3'
 __copyright__ = 'Copyright 2013 Gauvain Pocentek'
 
 
+def stdout_encode(text):
+    if None != sys.stdout.encoding:
+        return text.encode(sys.stdout.encoding, "replace")
+    return text.encode("iso8859-1", 'replace')
+
+
 class jsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, GitlabObject):
@@ -302,7 +308,7 @@ class Gitlab(object):
             if type(v) in (int, str, bool):
                 d[k] = str(v)
             elif type(v) == unicode:
-                d[k] = str(v.encode(sys.stdout.encoding, "replace"))
+                d[k] = str(stdout_encode(v))
 
         try:
             r = requests.put(url, d,
@@ -574,7 +580,7 @@ class GitlabObject(object):
             s = ", ".join([GitlabObject._obj_to_str(x) for x in obj])
             return "[ %s ]" % s
         elif isinstance(obj, unicode):
-            return obj.encode(sys.stdout.encoding, "replace")
+            return stdout_encode(obj)
         else:
             return str(obj)
 
@@ -585,19 +591,18 @@ class GitlabObject(object):
             if k == self.idAttr:
                 continue
             v = self.__dict__[k]
-            pretty_k = k.replace('_', '-').encode(sys.stdout.encoding,
-                                                  "replace")
+            pretty_k = stdout_encode(k.replace('_', '-'))
             if isinstance(v, GitlabObject):
                 if depth == 0:
                     print("%s:" % pretty_k)
                     v.pretty_print(1)
                 else:
-                    print("%s: %s" % (pretty_k, v.id))
+                    print(u"{}: {}".format(pretty_k, v.id))
             else:
                 if isinstance(v, Gitlab):
                     continue
-                v = GitlabObject._obj_to_str(v)
-                print("%s%s: %s" % (" " * depth * 2, pretty_k, v))
+                v = stdout_encode(GitlabObject._obj_to_str(v))
+                print(u"{0}{1}: {2}".format(u" " * depth * 2, pretty_k, v))
 
     def json(self):
         return json.dumps(self.__dict__, cls=jsonEncoder)
