@@ -1110,3 +1110,50 @@ class Team(GitlabObject):
         return self._getListOrObject(TeamProject, id,
                                      team_id=self.id,
                                      **kwargs)
+
+# No REST anymore - specific stuffs
+class Rights(GitlabObject):
+    # First, what can we do?
+    # rights list -- dump a list of all group/project rights.
+    canGet = False
+    canList = True
+    canCreate = False
+    canUpdate = False
+    canDelete = False
+
+    @classmethod
+    def list(cls, gl, **kwargs):
+        info = {'groups': {}, 'projects': {}, }
+        groups = gl.list(Group)
+        for g in groups:
+            name = g.__dict__['name']
+            info['groups'][name] = {
+                'id': g.__dict__['id'],
+                'members': {},
+            }
+            for m in g.Member():
+                uname = m.__dict__['username']
+                info['groups'][name]['members'][uname] = {
+                    'id': m.__dict__['id'],
+                    'name': m.__dict__['name'],
+                    'access': m.__dict__['access_level'],
+                }
+        projects = gl.list(Project)
+        for p in projects:
+            name = p.__dict__['path_with_namespace']
+            info['projects'][name] = {
+                'id': p.__dict__['id'],
+                'members': {},
+            }
+            for m in p.Member():
+                uname = m.__dict__['username']
+                info['projects'][name]['members'][uname] = {
+                    'id': m.__dict__['id'],
+                    'name': m.__dict__['name'],
+                    'access': m.__dict__['access_level'],
+                }
+        for items in info.values():
+            for name, value in items.items():
+                for user, info in value['members'].items():
+                    print '{1}:{0}:{2}'.format(name, user, info['access'])
+        return []
