@@ -31,7 +31,7 @@ __copyright__ = 'Copyright 2013 Gauvain Pocentek'
 def stdout_encode(text):
     if None != sys.stdout.encoding:
         return text.encode(sys.stdout.encoding, "replace")
-    return text.encode("iso8859-1", 'replace')
+    return text.encode("ascii", 'replace')
 
 
 class jsonEncoder(json.JSONEncoder):
