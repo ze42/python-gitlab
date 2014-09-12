@@ -1155,5 +1155,5 @@ class Rights(GitlabObject):
         for items in info.values():
             for name, value in items.items():
                 for user, info in value['members'].items():
-                    print '{1}:{0}:{2}'.format(name, user, info['access'])
+                    print '{id}:{user}:{name}:{access}'.format(name=name, user=user, id=info['id'], access=info['access'])
         return []
